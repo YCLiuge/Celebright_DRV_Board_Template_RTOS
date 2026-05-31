@@ -557,7 +557,12 @@ __weak void Display_Handler(void *argument)
 __weak void Reserved_Handler(void *argument)
 {
   /* USER CODE BEGIN Reserved_Handler */
+#if APP_ENABLE_RESERVED
   AppReserved_Task(argument);
+#else
+  ReservedHandle = NULL;
+  vTaskDelete(NULL);
+#endif
   /* USER CODE END Reserved_Handler */
 }
 

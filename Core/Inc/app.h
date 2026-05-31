@@ -51,6 +51,9 @@ extern "C" {
 #define APP_ENABLE_IMU          1   /* IMU sensor (ICM-45686) */
 #define APP_ENABLE_LEDBLINK     1   /* LED blink task */
 #define APP_ENABLE_BROADCAST    0   /* Bluetooth broadcast via UART4 */
+#define APP_ENABLE_RESERVED     0   /* 自主行驶测试任务: 开启会在上电后接管小车,
+                                     * 与 CLI(car cruise/go/...) 冲突。默认关闭,
+                                     * 仅在做整车动作测试时临时置 1。 */
 
 /* Display type: DISPLAY_TYPE_OLED or DISPLAY_TYPE_LCD */
 #define DISPLAY_TYPE_OLED  0
@@ -224,7 +227,9 @@ void AppKeyScan_Task(void *argument);
 #if APP_ENABLE_MUSIC
 void AppBuzzer_Task(void *argument);
 #endif
+#if APP_ENABLE_RESERVED
 void AppReserved_Task(void *argument);
+#endif
 
 #if APP_ENABLE_SYSMON
 void AppSysMon_Task(void *argument);

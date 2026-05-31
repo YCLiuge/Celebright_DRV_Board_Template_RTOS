@@ -198,9 +198,11 @@ void AppBuzzer_Task(void *argument)
  * 方向约定 (与 car_control.c 一致): 负角 = CW(右转), 正角 = CCW(左转)。
  * 距离段任一超时 → 强制停车 + LED2 闪烁。
  * ======================================================================== */
+#if APP_ENABLE_RESERVED
 
-/* 单段动作最大允许时间 (ms)。MAX_V_ANGLE=20°/s 时 90° 旋转约 6s,
- * MAX_V_REAL≈452mm/s 时 1000mm 约 3s, 15s 留足裕量。 */
+/* 单段动作最大允许时间 (ms)。MAX_V_ANGLE=10°/s 时 90° 旋转约 9s,
+ * MAX_V_REAL≈452mm/s 时 1000mm 约 3s, 15s 留足裕量。
+ * 若进一步调低 MAX_V_ANGLE, 需同步增大此值以免误判超时。 */
 #define MOVE_TIMEOUT_MS     15000U
 
 /* 阻塞等待当前运动指令完成。oprate_done 由下一次 Set_Car_Control()
@@ -286,3 +288,4 @@ test_fault:
         osDelay(200);
     }
 }
+#endif /* APP_ENABLE_RESERVED */
