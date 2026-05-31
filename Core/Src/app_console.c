@@ -301,6 +301,7 @@ static BaseType_t CLI_CarCommand(char *buf, size_t len, const char *cmd)
     if (PARAM_MATCH(sub, sublen, "stop"))
     {
         g_cruise_speed = 0.0F;
+        g_cruise_turn  = 0.0F;
         Set_Car_Control(0, 0, 0);
         (void)snprintf(buf, len, "Car: stopped.\r\n");
     }
@@ -381,15 +382,16 @@ static BaseType_t CLI_CarCommand(char *buf, size_t len, const char *cmd)
         v = (float)atof(p1);
         angle = (p2 != NULL) ? (float)atof(p2) : 0.0F;
         g_cruise_speed = (fabsf(v) < 0.5F) ? 0.0F : v;
-        if (g_cruise_speed == 0.0F)
+        g_cruise_turn  = (fabsf(angle) < 0.5F) ? 0.0F : angle;
+        if (g_cruise_speed == 0.0F && g_cruise_turn == 0.0F)
         {
             Set_Car_Attitude(0, 0);
             (void)snprintf(buf, len, "Cruise: stopped.\r\n");
         }
         else
         {
-            Set_Car_Attitude(v, angle);
-            (void)snprintf(buf, len, "Cruise: %.1f mm/s, %.1f deg/s\r\n", (double)v, (double)angle);
+            Set_Car_Attitude(g_cruise_speed, g_cruise_turn);
+            (void)snprintf(buf, len, "Cruise: %.1f mm/s, %.1f deg/s\r\n", (double)g_cruise_speed, (double)g_cruise_turn);
         }
     }
     else if (PARAM_MATCH(sub, sublen, "turn"))

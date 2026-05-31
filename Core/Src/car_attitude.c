@@ -17,7 +17,8 @@
 #endif
 _car_attitude car_attitude={0};//car_attitude内变量全部初始化为0
 car_state_t car_state={0};         //共享状态
-float g_cruise_speed = 0.0f;       //巡航速度 (mm/s), 0=关闭
+float g_cruise_speed = 0.0f;       //巡航线速度 (mm/s), 0=关闭
+float g_cruise_turn  = 0.0f;       //巡航角速度 (deg/s), 0=不转 (与 g_cruise_speed 同时生效, 支持原地转)
 
 
 /*!
