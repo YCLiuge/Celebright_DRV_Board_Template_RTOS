@@ -12,7 +12,7 @@
 #define ZOOM_PID_TO_DUTY        0.001F
 
 /* 电机输出最大 PWM 占空比 */
-#define MAX_MOTOR_DUTY          0.999F
+#define MAX_MOTOR_DUTY          0.3F
 
 /* ====== 增量式 PID 增量限幅 ====== */
 #define LIMIT_INC_LF            0.5F * MAX_MOTOR_DUTY / ZOOM_PID_TO_DUTY

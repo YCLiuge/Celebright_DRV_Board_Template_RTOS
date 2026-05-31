@@ -18,6 +18,7 @@ void IMU_init(void);
 void IMU_getYawPitchRoll(float * ypr); //获取姿态
 void IMU_TT_getgyro(float * zsjganda);
 size_t IMU_BuildStatus(char *buf, size_t buf_len);  /* IMU status for CLI */
+int IMU_IsCalibrated(void);  /* 陀螺仪零偏校准完成返回非0 */
 //uint32_t micros(void);	//获取系统上电以来时间  单位 us 
 void MPU6050_InitAng_Offset(void);
 #endif

@@ -39,6 +39,7 @@ void clear_car_control(void){
     car_state.yaw_circles=0;
     Wheel_Clear_Distance();
     PID_Clear(&car_control.pid_line_pos);
+    PID_Clear(&car_control.pid_spin);      /* 否则上一次 spin 的积分会残留, 新 spin 起步反向 */
     PID_Clear(&car_attitude.pid_v_angle);
 }
 
