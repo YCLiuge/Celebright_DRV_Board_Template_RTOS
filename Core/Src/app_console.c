@@ -318,9 +318,9 @@ static BaseType_t CLI_CarCommand(char *buf, size_t len, const char *cmd)
             "V_Ang: %6.1f / %6.1f deg/s (cur / tgt)\r\n"
             "Stop:  %s\r\n",
             (double)car_state.yaw, (double)car_state.yaw_all, car_state.yaw_circles,
-            (double)car_state.v_line, (double)car_state.v_line_target,
-            (double)car_state.v_angle, (double)car_state.v_angle_target,
-            car_state.flag_stop ? "YES" : "NO");
+            (double)car_attitude.current_v_line, (double)car_attitude.target_v_line,
+            (double)car_attitude.current_v_angle, (double)car_attitude.target_v_angle,
+            car_attitude.flag_stop ? "YES" : "NO");
     }
     else if (PARAM_MATCH(sub, sublen, "speed"))
     {
@@ -398,7 +398,7 @@ static BaseType_t CLI_CarCommand(char *buf, size_t len, const char *cmd)
         { (void)snprintf(buf, len, "Usage: car turn <deg>\r\n"); return pdFALSE; }
         angle = (float)atof(p1);
         /* Save current speed for auto-resume after turn completes */
-        g_cruise_speed = car_state.v_line_target;
+        g_cruise_speed = car_attitude.target_v_line;
         Set_Car_Control(0, 0, angle);
         (void)snprintf(buf, len, "Car: turn %.1f deg (cruise %.1f mm/s)\r\n", (double)angle, (double)g_cruise_speed);
     }
