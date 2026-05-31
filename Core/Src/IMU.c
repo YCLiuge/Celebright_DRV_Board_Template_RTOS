@@ -101,14 +101,18 @@ void calGyroVariance(float data[], int length, float sqrResult[], float avgResul
 }
 float gyro_offset[3] = {0};
 int CalCount = 0;
+/* 陀螺仪零偏自校准完成标志 (一次性 latch)。校准前 car_state.yaw 冻结,
+ * 故任何依赖 yaw 的动作 (如 SPIN) 在校准完成前都不应启动。 */
+static volatile _Bool s_imu_calibrated = 0;
+
+int IMU_IsCalibrated(void) { return (int)s_imu_calibrated; }
 /**************************实现函数********************************************
 *函数原型:	   void IMU_getValues(float * values)
 *功　　能:	 获取加速度、陀螺仪、磁力计的当前值  
 输入参数:  存储数据的指针地址
 输出参数:  无
 *******************************************************************************/
-void IMU_getValues(float * values) {  
-	static _Bool if_get_offset = 0;//是否获取偏移量
+void IMU_getValues(float * values) {
 	float accgyroval[7];
 	
 	float sqrResult_gyro[3];
@@ -132,7 +136,7 @@ void IMU_getValues(float * values) {
 		eyInt = 0;
 		ezInt = 0;
 		CalCount = 0;
-		if_get_offset=1;
+		s_imu_calibrated = 1;
 	} else if (CalCount < 100) {
 		CalCount++;
 	}
@@ -143,7 +147,7 @@ void IMU_getValues(float * values) {
 	values[4] =  accgyroval[4] - gyro_offset[1];
 	values[5] =  accgyroval[5] - gyro_offset[2];
 	imu_g_z=values[5];//z轴角速度
-	if(if_get_offset==1)
+	if(s_imu_calibrated)
 	{
 		Car_Attitude_Yaw_Update(imu_g_z,0.001F*TASK_ITV_IMU);
 	}

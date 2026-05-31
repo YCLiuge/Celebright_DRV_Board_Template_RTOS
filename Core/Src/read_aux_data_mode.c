@@ -71,24 +71,24 @@ int si_print_error_if_any(int rc)
 	return rc;
 }
 /*******************************************************************************
-* Ãû    ³Æ£º icm42688_read_regs
-* ¹¦    ÄÜ£º Á¬Ðø¶ÁÈ¡¶à¸ö¼Ä´æÆ÷µÄÖµ
-* Èë¿Ú²ÎÊý£º reg: ÆðÊ¼¼Ä´æÆ÷µØÖ· *bufÊý¾ÝÖ¸Õë,uint16_t len³¤¶È
-* ³ö¿Ú²ÎÊý£º ÎÞ
-* ×÷¡¡¡¡Õß£º Baxiange
-* ´´½¨ÈÕÆÚ£º 2024-07-25
-* ÐÞ    ¸Ä£º
-* ÐÞ¸ÄÈÕÆÚ£º
-* ±¸    ×¢£º Ê¹ÓÃSPI¶ÁÈ¡¼Ä´æÆ÷Ê±Òª×¢Òâ:×î¸ßÎ»Îª¶ÁÐ´Î»£¬Ïê¼ûdatasheet page50.
+* ï¿½ï¿½    ï¿½Æ£ï¿½ icm42688_read_regs
+* ï¿½ï¿½    ï¿½Ü£ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+* ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ reg: ï¿½ï¿½Ê¼ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ö· *bufï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½,uint16_t lenï¿½ï¿½ï¿½ï¿½
+* ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß£ï¿½ Baxiange
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ 2024-07-25
+* ï¿½ï¿½    ï¿½Ä£ï¿½
+* ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½Ú£ï¿½
+* ï¿½ï¿½    ×¢ï¿½ï¿½ Ê¹ï¿½ï¿½SPIï¿½ï¿½È¡ï¿½Ä´ï¿½ï¿½ï¿½Ê±Òª×¢ï¿½ï¿½:ï¿½ï¿½ï¿½Î»Îªï¿½ï¿½Ð´Î»ï¿½ï¿½ï¿½ï¿½ï¿½datasheet page50.
 *******************************************************************************/
 static int icm45686_read_regs(uint8_t reg, uint8_t* buf, uint32_t len)
 {
 #if defined(ICM_USE_HARD_SPI)
     reg |= 0x80;
     SPI_IMU_CS;
-    /* Ð´ÈëÒª¶ÁµÄ¼Ä´æÆ÷µØÖ· */
+    /* Ð´ï¿½ï¿½Òªï¿½ï¿½ï¿½Ä¼Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ö· */
     SPI4_ReadWriteByte(reg);
-    /* ¶ÁÈ¡¼Ä´æÆ÷Êý¾Ý */
+    /* ï¿½ï¿½È¡ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     while(len)
 	{
 		*buf = SPI4_ReadWriteByte(0x00);
@@ -106,10 +106,10 @@ static uint8_t io_write_reg(uint8_t reg, uint8_t value)
 {
 #if defined(ICM_USE_HARD_SPI)
     SPI_IMU_CS;
-    /* Ð´ÈëÒª¶ÁµÄ¼Ä´æÆ÷µØÖ· */
-    /* Ð´ÈëÒª¶ÁµÄ¼Ä´æÆ÷µØÖ· */
+    /* Ð´ï¿½ï¿½Òªï¿½ï¿½ï¿½Ä¼Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ö· */
+    /* Ð´ï¿½ï¿½Òªï¿½ï¿½ï¿½Ä¼Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ö· */
     SPI4_ReadWriteByte(reg);
-    /* ¶ÁÈ¡¼Ä´æÆ÷Êý¾Ý */
+    /* ï¿½ï¿½È¡ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     SPI4_ReadWriteByte(value);
     SPI_IMU_nCS;
 #elif defined(ICM_USE_I2C)
@@ -146,17 +146,17 @@ int setup_imu(int use_ln, int accel_en, int gyro_en)
 	imu_dev.transport.sleep_us   = delay_us;
 	//GPIO_InitTypeDef GPIO_Initure;
 			
-	//__HAL_RCC_GPIOA_CLK_ENABLE();           //Ê¹ÄÜGPIOAÊ±ÖÓ
+	//__HAL_RCC_GPIOA_CLK_ENABLE();           //Ê¹ï¿½ï¿½GPIOAÊ±ï¿½ï¿½
 	/*
 	//PA4
 	GPIO_Initure.Pin=GPIO_PIN_4;            //PA4
-	GPIO_Initure.Mode=GPIO_MODE_OUTPUT_PP;  //ÍÆÍìÊä³ö
-	GPIO_Initure.Pull=GPIO_PULLUP;          //ÉÏÀ­
-	GPIO_Initure.Speed=GPIO_SPEED_HIGH;     //¿ìËÙ         
-	HAL_GPIO_Init(GPIOA,&GPIO_Initure);     //³õÊ¼»¯
+	GPIO_Initure.Mode=GPIO_MODE_OUTPUT_PP;  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	GPIO_Initure.Pull=GPIO_PULLUP;          //ï¿½ï¿½ï¿½ï¿½
+	GPIO_Initure.Speed=GPIO_SPEED_HIGH;     //ï¿½ï¿½ï¿½ï¿½         
+	HAL_GPIO_Init(GPIOA,&GPIO_Initure);     //ï¿½ï¿½Ê¼ï¿½ï¿½
 	*/
-	SPI_IMU_nCS;			                //SPI FLASH²»Ñ¡ÖÐ
-	//SPI1_Init();		   			        //³õÊ¼»¯SPI
+	SPI_IMU_nCS;			                //SPI FLASHï¿½ï¿½Ñ¡ï¿½ï¿½
+	//SPI1_Init();		   			        //ï¿½ï¿½Ê¼ï¿½ï¿½SPI
 	//SPI1_SetSpeed(SPI_BAUDRATEPRESCALER_8); 
 			
 #endif
@@ -208,6 +208,17 @@ int setup_imu(int use_ln, int accel_en, int gyro_en)
 	rc |= inv_imu_set_gyro_fsr(&imu_dev, GYRO_CONFIG0_GYRO_UI_FS_SEL_1000_DPS);
 	SI_CHECK_RC(rc);
 
+	/* éªŒè¯ GYRO_CONFIG0 å›žè¯» */
+	{
+		gyro_config0_t gyro_cfg_verify;
+		inv_imu_read_reg(&imu_dev, GYRO_CONFIG0, 1, (uint8_t *)&gyro_cfg_verify);
+		printf("[IMU] GYRO_CONFIG0 = 0x%02X  (FS_SEL=%d, ODR=%d)\r\n",
+		       *(uint8_t *)&gyro_cfg_verify,
+		       gyro_cfg_verify.gyro_ui_fs_sel,
+		       gyro_cfg_verify.gyro_odr);
+		printf("[IMU]   Expected FS_SEL=2 (Â±1000 dps)\r\n");
+	}
+
 	/* Set ODR */
 	rc |= inv_imu_set_accel_frequency(&imu_dev, ACCEL_CONFIG0_ACCEL_ODR_200_HZ);
 	rc |= inv_imu_set_gyro_frequency(&imu_dev, GYRO_CONFIG0_GYRO_ODR_200_HZ);
@@ -256,9 +267,23 @@ int bsp_IcmGetRawData(float accel_mg[3], float gyro_dps[3], float *temp_degc)
 	accel_mg[0] = (float)((d.accel_data[0] * 4 /* mg */) / 32.768);
 	accel_mg[1] = (float)((d.accel_data[1] * 4 /* mg */) / 32.768);
 	accel_mg[2] = (float)((d.accel_data[2] * 4 /* mg */) / 32.768);
-	gyro_dps[0] = (float)((d.gyro_data[0] * 1000 /* dps */) / 32768.0);
-	gyro_dps[1] = (float)((d.gyro_data[1] * 1000 /* dps */) / 32768.0);
-	gyro_dps[2] = (float)((d.gyro_data[2] * 1000 /* dps */) / 32768.0);
+	/*
+	 * Gyro sensitivity calibration.
+	 *
+	 * GYRO_CONFIG0 is configured for +/-1000 dps (FS_SEL=2 -> 32.8 LSB/dps) and a
+	 * register read-back confirms FS_SEL=2, so the textbook conversion would be
+	 * dps = raw * 1000 / 32768. However, bench measurement of this ICM-45686
+	 * shows the reported angular rate is a robust 2x the true value (a commanded
+	 * 90 deg spin physically rotates ~45 deg, stable across angles). The part
+	 * behaves as if it were in the +/-500 dps range (65.5 LSB/dps) despite the
+	 * +/-1000 dps register setting. The integration dt (5 ms) and the single
+	 * integration path were both verified correct, so the 2x is in the raw->dps
+	 * scale. We divide by the empirically-correct full scale (500 dps) to match
+	 * physical reality. Equivalent to the prior /65536.
+	 */
+	gyro_dps[0] = (float)((d.gyro_data[0] * 500 /* dps, effective FS */) / 32768.0);
+	gyro_dps[1] = (float)((d.gyro_data[1] * 500 /* dps, effective FS */) / 32768.0);
+	gyro_dps[2] = (float)((d.gyro_data[2] * 500 /* dps, effective FS */) / 32768.0);
 	*temp_degc  = (float)(25 + (d.temp_data / 128.0));
 	return 0;
 }

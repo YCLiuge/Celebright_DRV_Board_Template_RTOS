@@ -29,16 +29,16 @@
 #define ENC_EVERY_CIRCLE        ((float)(ENC_LINES * ENC_MULTIPLIER * GEAR_RATIO))
 
 /* 轮径 mm */
-#define WHEEL_DIR               47F
+#define WHEEL_DIR               72.0F
 
 /* 轮周长 mm */
-#define WHEEL_PERIMETER         148.722996F
+#define WHEEL_PERIMETER         226.194671F
 
 /* 左右轮距的一半 mm（用 IMU 测算） */
-#define FRAME_W_HALF            66.25F
+#define FRAME_W_HALF            122.50F
 
 /* 前后轮轴距的一半 mm */
-#define FRAME_L_HALF            55.85F
+#define FRAME_L_HALF            102.50F
 
 /* 编码器速度 → 实际速度 换算系数 */
 #define V_REAL_TO_ENC           (ENC_EVERY_CIRCLE / WHEEL_PERIMETER)
@@ -49,7 +49,12 @@
 /* 电机最大实际速度 (mm/s) */
 #define MAX_V_REAL              (MAX_V_ENC / V_REAL_TO_ENC)
 
-/* 最大角速度 (degree/s) */
-#define MAX_V_ANGLE             60.0F
+/* 最大角速度 (degree/s)
+ * 调低可减小 spin 接近目标时的实际转速, 从而减小动量滑行造成的过冲
+ * (实测 20°/s 时停在目标后仍滑 ~2-3°)。这是过冲调节的主旋钮;
+ * 若仍过冲可继续调低, 或提高 control_config.h 的 D_SPIN 加强末端制动。
+ * 注意: 过低会使 90° 旋转耗时超过 AppReserved_Task 的 MOVE_TIMEOUT_MS(15s)
+ *       而误判超时。10°/s 时 90°≈9s, 安全。 */
+#define MAX_V_ANGLE             10.0F
 
 #endif /* __PLATFORM_CONFIG_H__ */

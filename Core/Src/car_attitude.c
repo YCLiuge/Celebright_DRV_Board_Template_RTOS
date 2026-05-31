@@ -115,6 +115,10 @@ void Set_Car_Attitude(float v_line_target,float v_angle_target){
  */
 void Set_Car_Stop(void){
     car_attitude.flag_stop=1;
+    /* 停车时清角速度环积分: 停车期间 PID 不运行(积分被冻结), 若不清零,
+     * 下次起步(如 spin 后转巡航)会带着上次的积分残留导致跑偏。
+     * 仅在停车时清零安全——运动中 (flag_stop=0) 不会进入此函数。 */
+    PID_Clear(&car_attitude.pid_v_angle);
 }
 
 /*!

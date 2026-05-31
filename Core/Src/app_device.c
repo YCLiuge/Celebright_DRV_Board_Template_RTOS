@@ -188,13 +188,101 @@ void AppBuzzer_Task(void *argument)
 #endif
 
 /* ========================================================================
- * Reserved — placeholder for future extensions
+ * Reserved — 运动序列测试
+ *
+ * 上电 3s + 陀螺仪校准后依次执行:
+ *   直行 1000mm → 右转 90° → 直行 100mm → 左转 90°
+ *   → 100mm/s 巡航 10s → 1000mm/s 巡航 3s。
+ * 距离段阻塞等待 car_control.oprate_done; 巡航段按时间 osDelay。
+ * 全部完成后 LED2 常亮。
+ * 方向约定 (与 car_control.c 一致): 负角 = CW(右转), 正角 = CCW(左转)。
+ * 距离段任一超时 → 强制停车 + LED2 闪烁。
  * ======================================================================== */
+
+/* 单段动作最大允许时间 (ms)。MAX_V_ANGLE=20°/s 时 90° 旋转约 6s,
+ * MAX_V_REAL≈452mm/s 时 1000mm 约 3s, 15s 留足裕量。 */
+#define MOVE_TIMEOUT_MS     15000U
+
+/* 阻塞等待当前运动指令完成。oprate_done 由下一次 Set_Car_Control()
+ * (内部 clear_car_control) 清零, 完成时由 Car_Control_Update_Input() 置 1。
+ * 超时返回 false 并强制停车 (防止 spin 因 yaw 未更新而无限旋转)。 */
+static bool wait_operation_done(uint32_t timeout_ms)
+{
+    uint32_t waited = 0;
+    while (!car_control.oprate_done)
+    {
+        osDelay(10);
+        waited += 10;
+        if (waited >= timeout_ms)
+        {
+            Set_Car_Control(0.0F, 0.0F, 0.0F);  /* 强制停车 */
+            return false;
+        }
+    }
+    return true;
+}
+
 void AppReserved_Task(void *argument)
 {
     (void)argument;
+
+    osDelay(3000);  /* 等系统初始化 */
+
+#if APP_ENABLE_IMU
+    /* 等陀螺仪零偏校准完成: 校准前 car_state.yaw 冻结, SPIN 永不结束。
+     * 最多等 5s, 超时仍继续 (单段超时保护会兜底强制停车)。 */
+    {
+        uint32_t cal_waited = 0;
+        while (!IMU_IsCalibrated() && cal_waited < 5000U)
+        {
+            osDelay(50);
+            cal_waited += 50;
+        }
+    }
+#endif
+
+    /* ====== Step 1: 直行 1000mm ====== */
+    Set_Car_Control(1000.0F, 0.0F, 0.0F);
+    if (!wait_operation_done(MOVE_TIMEOUT_MS)) goto test_fault;
+    osDelay(500);   /* 段间停顿, 让动量/姿态稳定 */
+
+    /* ====== Step 2: 右转 90° (负角 = CW) ====== */
+    Set_Car_Control(0.0F, 0.0F, -90.0F);
+    if (!wait_operation_done(MOVE_TIMEOUT_MS)) goto test_fault;
+    osDelay(500);
+
+    /* ====== Step 3: 直行 100mm ====== */
+    Set_Car_Control(100.0F, 0.0F, 0.0F);
+    if (!wait_operation_done(MOVE_TIMEOUT_MS)) goto test_fault;
+    osDelay(500);
+
+    /* ====== Step 4: 左转 90° (正角 = CCW) ====== */
+    Set_Car_Control(0.0F, 0.0F, 90.0F);
+    if (!wait_operation_done(MOVE_TIMEOUT_MS)) goto test_fault;
+    osDelay(500);
+
+    /* ====== Step 5: 100mm/s 巡航前进 10s ======
+     * 巡航靠 g_cruise_speed: 前几步结束后 mode 已为 STOP,
+     * Car_Control_Update_Output 的 default 分支每周期施加该速度。 */
+    g_cruise_speed = 100.0F;
+    osDelay(10000);
+
+    /* ====== Step 6: 1000mm/s 巡航前进 3s ======
+     * 注意: 1000mm/s 超过 MAX_V_REAL(≈452mm/s), 会被 Set_Car_Attitude 限幅。 */
+    g_cruise_speed = 1000.0F;
+    osDelay(3000);
+
+    g_cruise_speed = 0.0F;  /* 关闭巡航, 控制环 default 分支下一周期停车 */
+
+    /* ====== 测试完成, LED2 常亮 ====== */
+    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+    vTaskDelete(NULL);
+
+test_fault:
+    /* 某段动作超时, 已强制停车; LED2 闪烁提示故障 */
     for (;;)
     {
-        osDelay(50);
+        HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+        osDelay(200);
     }
 }
