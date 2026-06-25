@@ -329,6 +329,7 @@ static BaseType_t CLI_CarCommand(char *buf, size_t len, const char *cmd)
         { (void)snprintf(buf, len, "Usage: car speed <mm/s>\r\n"); return pdFALSE; }
         v = (float)atof(p1);
         Set_Car_Attitude(v, 0);
+        PID_Clear(&car_attitude.pid_v_angle);  /* 清角速度 PID 积分, 防止旋转→直线切换时积分残留导致跑偏 */
         (void)snprintf(buf, len, "Car speed: %.1f mm/s\r\n", (double)v);
     }
     else if (PARAM_MATCH(sub, sublen, "go"))
@@ -391,6 +392,14 @@ static BaseType_t CLI_CarCommand(char *buf, size_t len, const char *cmd)
         else
         {
             Set_Car_Attitude(g_cruise_speed, g_cruise_turn);
+            /* 仅在角速度目标归零时清角速度 PID 积分:
+             * 旋转巡航→直线巡航时, 旋转阶段累积的大积分会导致
+             * 左右轮差速异常 (左轮反转、右轮快转)。
+             * 旋转速度之间切换 (如 10→30 deg/s) 不清 PID,
+             * 让积分平滑过渡, 保证角速度响应。 */
+            if (fabsf(g_cruise_turn) < 0.5F) {
+                PID_Clear(&car_attitude.pid_v_angle);
+            }
             (void)snprintf(buf, len, "Cruise: %.1f mm/s, %.1f deg/s\r\n", (double)g_cruise_speed, (double)g_cruise_turn);
         }
     }
