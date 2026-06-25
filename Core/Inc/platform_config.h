@@ -29,16 +29,16 @@
 #define ENC_EVERY_CIRCLE        ((float)(ENC_LINES * ENC_MULTIPLIER * GEAR_RATIO))
 
 /* 轮径 mm */
-#define WHEEL_DIR               72.0F
+#define WHEEL_DIR               85.0F
 
 /* 轮周长 mm */
-#define WHEEL_PERIMETER         226.194671F
+#define WHEEL_PERIMETER         267.03538F
 
 /* 左右轮距的一半 mm（用 IMU 测算） */
-#define FRAME_W_HALF            122.50F
+#define FRAME_W_HALF            95.0F
 
 /* 前后轮轴距的一半 mm */
-#define FRAME_L_HALF            102.50F
+#define FRAME_L_HALF            95.0F
 
 /* 编码器速度 → 实际速度 换算系数 */
 #define V_REAL_TO_ENC           (ENC_EVERY_CIRCLE / WHEEL_PERIMETER)
@@ -55,6 +55,6 @@
  * 若仍过冲可继续调低, 或提高 control_config.h 的 D_SPIN 加强末端制动。
  * 注意: 过低会使 90° 旋转耗时超过 AppReserved_Task 的 MOVE_TIMEOUT_MS(15s)
  *       而误判超时。10°/s 时 90°≈9s, 安全。 */
-#define MAX_V_ANGLE             10.0F
+#define MAX_V_ANGLE             20.0F
 
 #endif /* __PLATFORM_CONFIG_H__ */
